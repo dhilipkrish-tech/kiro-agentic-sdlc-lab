@@ -20,12 +20,12 @@ A user submits a claim with four fields:
 
 The backend applies deterministic business rules in a **fixed order (first match wins):**
 
-1. `quantity > 30` → **REJECTED** / `QUANTITY_LIMIT_EXCEEDED`
+1. `quantity > 60` → **REJECTED** / `QUANTITY_LIMIT_EXCEEDED`
 2. `drugId == "DRUG-PA-001"` → **REJECTED** / `PRIOR_AUTHORIZATION_REQUIRED`
 3. otherwise → **PAID**, with `calculatedAmount == submittedAmount`
 
 Because quantity limit is evaluated **before** prior authorization, a prior-auth drug
-submitted over the limit (e.g. `DRUG-PA-001` with `quantity = 31`) is rejected with
+submitted over the limit (e.g. `DRUG-PA-001` with `quantity = 61`) is rejected with
 `QUANTITY_LIMIT_EXCEEDED`, **not** `PRIOR_AUTHORIZATION_REQUIRED`.
 
 Structural/input validation failures (missing fields, `quantity <= 0`, negative amount)
@@ -135,9 +135,24 @@ The suite includes **positive**, **negative**, and **boundary** cases, plus expl
 | R8 separation of concerns | `test_rules.py` imports only rules/models (no HTTP server) |
 | R9 frontend | `tests-e2e/claim.spec.js` |
 | R10 quality/docs | full pytest suite + this README |
-| **R11 precedence** (DRUG-PA-001 + qty 31 → QUANTITY_LIMIT_EXCEEDED) | `test_rules.py::test_precedence_quantity_over_prior_auth`, `test_api.py::test_precedence_quantity_over_prior_auth`, `tests-e2e/claim.spec.js` |
-| **R11 precedence boundary** (DRUG-PA-001 + qty 30 → PRIOR_AUTHORIZATION_REQUIRED) | `test_rules.py::test_precedence_boundary_prior_auth` |
+| **R11 precedence** (DRUG-PA-001 + qty 61 → QUANTITY_LIMIT_EXCEEDED) | `test_rules.py::test_precedence_quantity_over_prior_auth`, `test_api.py::test_precedence_quantity_over_prior_auth`, `tests-e2e/claim.spec.js` |
+| **R11 precedence boundary** (DRUG-PA-001 + qty 60 → PRIOR_AUTHORIZATION_REQUIRED) | `test_rules.py::test_precedence_boundary_prior_auth` |
 | **R11 determinism** | `test_rules.py::test_determinism`, `test_api.py::test_determinism` |
+
+## Security controls
+
+This repo includes a defense-in-depth guardrail set that prevents or surfaces any agent
+action touching files **outside** the project root. It is threat-model-first and
+deny-by-default. The primary control is Kiro's native **Local Sandboxing**
+(kernel-enforced, enabled via `.kiro/settings/sandbox.json`), backed by a steering policy,
+an audit-monitor hook, and a control-test suite (including a prompt-injection scenario).
+
+See [`.kiro/security/README.md`](.kiro/security/README.md) for the full design and how to
+run the control tests:
+
+```bash
+bash .kiro/security/tests/control-tests.sh   # verify the sandbox + supporting controls
+```
 
 ## Project structure
 

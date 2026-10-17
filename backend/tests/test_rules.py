@@ -28,8 +28,8 @@ def test_paid_calculated_amount():
 # --- Negative (business rejections) -------------------------------------------
 
 def test_quantity_over_limit():
-    """R5: quantity 31 -> REJECTED / QUANTITY_LIMIT_EXCEEDED."""
-    result = adjudicate(make_claim(quantity=31))
+    """R5: quantity 61 -> REJECTED / QUANTITY_LIMIT_EXCEEDED."""
+    result = adjudicate(make_claim(quantity=61))
     assert result.status is ClaimStatus.REJECTED
     assert result.reasonCode is ReasonCode.QUANTITY_LIMIT_EXCEEDED
     assert result.calculatedAmount is None
@@ -45,9 +45,9 @@ def test_prior_auth():
 
 # --- Boundary -----------------------------------------------------------------
 
-def test_quantity_boundary_30():
-    """R3, R5: quantity exactly 30 is within limit -> PAID."""
-    result = adjudicate(make_claim(quantity=30))
+def test_quantity_boundary_60():
+    """R3, R5: quantity exactly 60 is within limit -> PAID."""
+    result = adjudicate(make_claim(quantity=60))
     assert result.status is ClaimStatus.PAID
     assert result.reasonCode is None
 
@@ -62,16 +62,16 @@ def test_amount_zero_paid():
 # --- Precedence (R11) ---------------------------------------------------------
 
 def test_precedence_quantity_over_prior_auth():
-    """R11.1: DRUG-PA-001 + quantity 31 -> QUANTITY_LIMIT_EXCEEDED, NOT prior auth."""
-    result = adjudicate(make_claim(drugId="DRUG-PA-001", quantity=31))
+    """R11.1: DRUG-PA-001 + quantity 61 -> QUANTITY_LIMIT_EXCEEDED, NOT prior auth."""
+    result = adjudicate(make_claim(drugId="DRUG-PA-001", quantity=61))
     assert result.status is ClaimStatus.REJECTED
     assert result.reasonCode is ReasonCode.QUANTITY_LIMIT_EXCEEDED
     assert result.reasonCode is not ReasonCode.PRIOR_AUTHORIZATION_REQUIRED
 
 
 def test_precedence_boundary_prior_auth():
-    """R11.2: DRUG-PA-001 + quantity 30 -> PRIOR_AUTHORIZATION_REQUIRED (qty within limit)."""
-    result = adjudicate(make_claim(drugId="DRUG-PA-001", quantity=30))
+    """R11.2: DRUG-PA-001 + quantity 60 -> PRIOR_AUTHORIZATION_REQUIRED (qty within limit)."""
+    result = adjudicate(make_claim(drugId="DRUG-PA-001", quantity=60))
     assert result.status is ClaimStatus.REJECTED
     assert result.reasonCode is ReasonCode.PRIOR_AUTHORIZATION_REQUIRED
 
@@ -80,7 +80,7 @@ def test_precedence_boundary_prior_auth():
 
 def test_determinism():
     """R1, R11.3: repeated adjudication of identical input -> identical result."""
-    claim = make_claim(drugId="DRUG-PA-001", quantity=31)
+    claim = make_claim(drugId="DRUG-PA-001", quantity=61)
     first = adjudicate(claim)
     for _ in range(5):
         assert adjudicate(claim).model_dump() == first.model_dump()

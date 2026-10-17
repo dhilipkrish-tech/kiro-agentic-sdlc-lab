@@ -27,7 +27,7 @@ test("prior-auth drug shows REJECTED / PRIOR_AUTHORIZATION_REQUIRED", async ({ p
 
 test("precedence: prior-auth drug over limit shows QUANTITY_LIMIT_EXCEEDED", async ({ page }) => {
   await page.goto("/");
-  await fillClaim(page, { memberId: "M1001", drugId: "DRUG-PA-001", quantity: 31, amount: 42.5 });
+  await fillClaim(page, { memberId: "M1001", drugId: "DRUG-PA-001", quantity: 61, amount: 42.5 });
   await expect(page.getByTestId("result-status")).toHaveText("REJECTED");
   await expect(page.getByTestId("result-reason")).toHaveText("QUANTITY_LIMIT_EXCEEDED");
 });

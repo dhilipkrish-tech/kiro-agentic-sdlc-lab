@@ -20,9 +20,9 @@ it satisfies.
   - _Requirements: R1, R5, R6, R7, R8_
 
 - [x] 4. Write unit tests for rules (`test_rules.py`)
-  - Positive (paid + calculatedAmount), negative (quantity 31, DRUG-PA-001), boundary (quantity 30, amount 0).
-  - **Precedence: DRUG-PA-001 + quantity 31 → QUANTITY_LIMIT_EXCEEDED, asserting NOT PRIOR_AUTHORIZATION_REQUIRED.**
-  - **Precedence boundary: DRUG-PA-001 + quantity 30 → PRIOR_AUTHORIZATION_REQUIRED.**
+  - Positive (paid + calculatedAmount), negative (quantity 61, DRUG-PA-001), boundary (quantity 60, amount 0).
+  - **Precedence: DRUG-PA-001 + quantity 61 → QUANTITY_LIMIT_EXCEEDED, asserting NOT PRIOR_AUTHORIZATION_REQUIRED.**
+  - **Precedence boundary: DRUG-PA-001 + quantity 60 → PRIOR_AUTHORIZATION_REQUIRED.**
   - **Determinism: repeated adjudication of identical input → identical result.**
   - _Requirements: R1, R5, R6, R7, R8, R10, R11_
 
@@ -32,7 +32,7 @@ it satisfies.
 
 - [x] 6. Write API tests (`test_api.py`)
   - Positive PAID, structural 422s (missing memberId, empty drugId, quantity 0, negative amount), business rejections, boundaries, determinism.
-  - **Precedence: DRUG-PA-001 + quantity 31 → 200 REJECTED / QUANTITY_LIMIT_EXCEEDED, asserting NOT PRIOR_AUTHORIZATION_REQUIRED.**
+  - **Precedence: DRUG-PA-001 + quantity 61 → 200 REJECTED / QUANTITY_LIMIT_EXCEEDED, asserting NOT PRIOR_AUTHORIZATION_REQUIRED.**
   - _Requirements: R1, R2, R3, R4, R5, R6, R10, R11_
 
 - [x] 7. Run and verify backend test suite
@@ -49,7 +49,7 @@ it satisfies.
   - _Requirements: R9_
 
 - [x] 10. Add Playwright E2E tests (`tests-e2e/`)
-  - Config + spec: paid flow, prior-auth rejection, and precedence (DRUG-PA-001 + qty 31). All 3 pass against live servers.
+  - Config + spec: paid flow, prior-auth rejection, and precedence (DRUG-PA-001 + qty 61). All 3 pass against live servers.
   - _Requirements: R9, R10, R11_
 
 - [x] 11. Write README

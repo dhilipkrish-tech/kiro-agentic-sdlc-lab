@@ -9,6 +9,9 @@ __pycache__/
 node_modules/
 dist/
 
+# Evaluation harness — generated reports (regenerated on every run)
+evaluation/out/
+
 # Playwright
 test-results/
 playwright-report/
@@ -16,3 +19,9 @@ playwright-report/
 
 # OS
 .DS_Store
+
+# Security — audit log artifacts (sink lives outside the repo by default;
+# these guard against an in-repo override via KIRO_AUDIT_DIR being committed)
+.kiro-agent-audit/
+**/outside-access.log
+**/.monitor-cursor
