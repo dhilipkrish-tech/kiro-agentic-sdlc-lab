@@ -63,8 +63,8 @@ def test_negative_amount_422():
 # --- Negative business (R5, R6) -> 200 REJECTED -------------------------------
 
 def test_quantity_limit_exceeded():
-    """R5.1: quantity 31 -> 200 REJECTED / QUANTITY_LIMIT_EXCEEDED."""
-    resp = post({**VALID, "quantity": 31})
+    """R5.1: quantity 61 -> 200 REJECTED / QUANTITY_LIMIT_EXCEEDED."""
+    resp = post({**VALID, "quantity": 61})
     assert resp.status_code == 200
     body = resp.json()
     assert body["status"] == "REJECTED"
@@ -83,9 +83,9 @@ def test_prior_auth():
 
 # --- Boundary -----------------------------------------------------------------
 
-def test_quantity_boundary_30_paid():
-    """R5.2: quantity exactly 30 -> 200 PAID."""
-    resp = post({**VALID, "quantity": 30})
+def test_quantity_boundary_60_paid():
+    """R5.2: quantity exactly 60 -> 200 PAID."""
+    resp = post({**VALID, "quantity": 60})
     assert resp.status_code == 200
     assert resp.json()["status"] == "PAID"
 
@@ -100,8 +100,8 @@ def test_amount_zero_paid():
 # --- Precedence (R11) ---------------------------------------------------------
 
 def test_precedence_quantity_over_prior_auth():
-    """R11.1: DRUG-PA-001 + quantity 31 -> QUANTITY_LIMIT_EXCEEDED, NOT prior auth."""
-    resp = post({**VALID, "drugId": "DRUG-PA-001", "quantity": 31})
+    """R11.1: DRUG-PA-001 + quantity 61 -> QUANTITY_LIMIT_EXCEEDED, NOT prior auth."""
+    resp = post({**VALID, "drugId": "DRUG-PA-001", "quantity": 61})
     assert resp.status_code == 200
     body = resp.json()
     assert body["status"] == "REJECTED"
@@ -113,7 +113,7 @@ def test_precedence_quantity_over_prior_auth():
 
 def test_determinism():
     """R1, R11.3: identical input submitted repeatedly -> identical responses."""
-    payload = {**VALID, "drugId": "DRUG-PA-001", "quantity": 31}
+    payload = {**VALID, "drugId": "DRUG-PA-001", "quantity": 61}
     first = post(payload).json()
     for _ in range(5):
         assert post(payload).json() == first

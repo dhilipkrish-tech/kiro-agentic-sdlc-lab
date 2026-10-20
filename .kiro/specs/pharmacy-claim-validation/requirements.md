@@ -58,7 +58,7 @@ quantities are not adjudicated.
 #### Acceptance Criteria
 
 1. WHEN `quantity` is less than or equal to 0 THEN the system SHALL return a validation error (HTTP 422).
-2. WHEN `quantity` is greater than 0 and less than or equal to 30 THEN the system SHALL treat the quantity as valid for adjudication.
+2. WHEN `quantity` is greater than 0 and less than or equal to 60 THEN the system SHALL treat the quantity as valid for adjudication.
 
 ### Requirement 4 — Submitted amount validation
 
@@ -77,8 +77,8 @@ rejected, so that over-limit dispensing is blocked.
 
 #### Acceptance Criteria
 
-1. WHEN a structurally valid claim has `quantity` greater than 30 THEN the system SHALL return `status = REJECTED` with `reasonCode = QUANTITY_LIMIT_EXCEEDED`.
-2. WHEN `quantity` is exactly 30 THEN the system SHALL NOT reject for quantity limit (boundary).
+1. WHEN a structurally valid claim has `quantity` greater than 60 THEN the system SHALL return `status = REJECTED` with `reasonCode = QUANTITY_LIMIT_EXCEEDED`.
+2. WHEN `quantity` is exactly 60 THEN the system SHALL NOT reject for quantity limit (boundary).
 
 ### Requirement 6 — Prior authorization business rule
 
@@ -88,7 +88,7 @@ be rejected when submitted without it, so that PA drugs are controlled.
 #### Acceptance Criteria
 
 1. WHEN a structurally valid claim has `drugId = "DRUG-PA-001"` THEN the system SHALL return `status = REJECTED` with `reasonCode = PRIOR_AUTHORIZATION_REQUIRED`.
-2. WHEN a claim has `drugId = "DRUG-PA-001"` AND also `quantity > 30` THEN the system SHALL reject with `QUANTITY_LIMIT_EXCEEDED` (quantity limit is evaluated first, deterministic rule ordering).
+2. WHEN a claim has `drugId = "DRUG-PA-001"` AND also `quantity > 60` THEN the system SHALL reject with `QUANTITY_LIMIT_EXCEEDED` (quantity limit is evaluated first, deterministic rule ordering).
 
 ### Requirement 11 — Rule precedence and determinism (explicit coverage)
 
@@ -97,8 +97,8 @@ and automatically verified, so that the fixed rule ordering can never silently r
 
 #### Acceptance Criteria
 
-1. WHEN `drugId = "DRUG-PA-001"` AND `quantity = 31` THEN the system SHALL return `status = REJECTED` with `reasonCode = QUANTITY_LIMIT_EXCEEDED` and SHALL NOT return `PRIOR_AUTHORIZATION_REQUIRED` (quantity limit strictly precedes prior authorization).
-2. WHEN `drugId = "DRUG-PA-001"` AND `quantity = 30` (at the quantity boundary) THEN the system SHALL return `status = REJECTED` with `reasonCode = PRIOR_AUTHORIZATION_REQUIRED` (quantity limit does not apply, so prior auth is the governing rule).
+1. WHEN `drugId = "DRUG-PA-001"` AND `quantity = 61` THEN the system SHALL return `status = REJECTED` with `reasonCode = QUANTITY_LIMIT_EXCEEDED` and SHALL NOT return `PRIOR_AUTHORIZATION_REQUIRED` (quantity limit strictly precedes prior authorization).
+2. WHEN `drugId = "DRUG-PA-001"` AND `quantity = 60` (at the quantity boundary) THEN the system SHALL return `status = REJECTED` with `reasonCode = PRIOR_AUTHORIZATION_REQUIRED` (quantity limit does not apply, so prior auth is the governing rule).
 3. WHEN any identical claim input is adjudicated repeatedly THEN the system SHALL return byte-for-byte identical results every time (determinism), and this SHALL be asserted by an automated test at both the rules layer and the API layer.
 4. The precedence behavior in criterion 1 SHALL be covered by a dedicated automated test at both the rules layer (`test_rules.py`) and the API layer (`test_api.py`).
 
@@ -152,7 +152,7 @@ is safe and reproducible.
 Adjudication evaluates in this fixed order (first match wins):
 
 1. Structural validation (memberId, drugId, quantity > 0, submittedAmount >= 0) → HTTP 422 if failing.
-2. `quantity > 30` → REJECTED / `QUANTITY_LIMIT_EXCEEDED`.
+2. `quantity > 60` → REJECTED / `QUANTITY_LIMIT_EXCEEDED`.
 3. `drugId == "DRUG-PA-001"` → REJECTED / `PRIOR_AUTHORIZATION_REQUIRED`.
 4. Otherwise → PAID, `calculatedAmount = submittedAmount`.
 

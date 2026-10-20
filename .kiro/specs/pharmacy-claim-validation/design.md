@@ -70,7 +70,7 @@ kiro-agentic-sdlc-lab/
 from enum import Enum
 from pydantic import BaseModel, Field, ConfigDict
 
-QUANTITY_LIMIT = 30
+QUANTITY_LIMIT = 60
 PRIOR_AUTH_DRUG_IDS = {"DRUG-PA-001"}
 
 class ClaimStatus(str, Enum):
@@ -189,18 +189,18 @@ Validation error (422): standard FastAPI validation error payload.
 
 ### Unit tests — `test_rules.py` (pure rules)
 - Positive: valid claim → PAID, calculatedAmount == submittedAmount.
-- Negative: quantity 31 → QUANTITY_LIMIT_EXCEEDED; DRUG-PA-001 → PRIOR_AUTHORIZATION_REQUIRED.
-- Boundary: quantity 30 → PAID; submittedAmount 0 → PAID.
-- **Precedence: DRUG-PA-001 with quantity 31 → QUANTITY_LIMIT_EXCEEDED, explicitly asserting it is NOT PRIOR_AUTHORIZATION_REQUIRED (quantity first).**
-- **Precedence boundary: DRUG-PA-001 with quantity 30 → PRIOR_AUTHORIZATION_REQUIRED (quantity limit does not apply).**
+- Negative: quantity 61 → QUANTITY_LIMIT_EXCEEDED; DRUG-PA-001 → PRIOR_AUTHORIZATION_REQUIRED.
+- Boundary: quantity 60 → PAID; submittedAmount 0 → PAID.
+- **Precedence: DRUG-PA-001 with quantity 61 → QUANTITY_LIMIT_EXCEEDED, explicitly asserting it is NOT PRIOR_AUTHORIZATION_REQUIRED (quantity first).**
+- **Precedence boundary: DRUG-PA-001 with quantity 60 → PRIOR_AUTHORIZATION_REQUIRED (quantity limit does not apply).**
 - **Determinism: adjudicating the same input repeatedly returns identical results.**
 
 ### API tests — `test_api.py` (FastAPI TestClient)
 - Positive: valid claim → 200 PAID.
 - Negative structural: missing memberId / empty drugId / quantity 0 / negative amount → 422.
-- Negative business: quantity 31 → 200 REJECTED; DRUG-PA-001 → 200 REJECTED.
-- Boundary: quantity 30 → PAID; amount 0 → PAID.
-- **Precedence: DRUG-PA-001 with quantity 31 → 200 REJECTED with QUANTITY_LIMIT_EXCEEDED, explicitly asserting it is NOT PRIOR_AUTHORIZATION_REQUIRED.**
+- Negative business: quantity 61 → 200 REJECTED; DRUG-PA-001 → 200 REJECTED.
+- Boundary: quantity 60 → PAID; amount 0 → PAID.
+- **Precedence: DRUG-PA-001 with quantity 61 → 200 REJECTED with QUANTITY_LIMIT_EXCEEDED, explicitly asserting it is NOT PRIOR_AUTHORIZATION_REQUIRED.**
 - Determinism: same input twice → identical response.
 
 ### E2E — Playwright (`tests-e2e/claim.spec.js`)
@@ -219,8 +219,8 @@ Validation error (422): standard FastAPI validation error payload.
 | R5 quantity limit | `test_rules.py::test_quantity_over_limit`, `test_api.py::test_quantity_limit_exceeded` |
 | R6 prior auth | `test_rules.py::test_prior_auth`, `test_api.py::test_prior_auth` |
 | R7 paid calculation | `test_rules.py::test_paid_calculated_amount` |
-| R11 precedence (DRUG-PA-001 + qty 31 → QUANTITY_LIMIT_EXCEEDED) | `test_rules.py::test_precedence_quantity_over_prior_auth`, `test_api.py::test_precedence_quantity_over_prior_auth` |
-| R11 precedence boundary (DRUG-PA-001 + qty 30 → PRIOR_AUTHORIZATION_REQUIRED) | `test_rules.py::test_precedence_boundary_prior_auth` |
+| R11 precedence (DRUG-PA-001 + qty 61 → QUANTITY_LIMIT_EXCEEDED) | `test_rules.py::test_precedence_quantity_over_prior_auth`, `test_api.py::test_precedence_quantity_over_prior_auth` |
+| R11 precedence boundary (DRUG-PA-001 + qty 60 → PRIOR_AUTHORIZATION_REQUIRED) | `test_rules.py::test_precedence_boundary_prior_auth` |
 | R11 determinism | `test_rules.py::test_determinism`, `test_api.py::test_determinism` |
 | R8 separation | `test_rules.py` imports only rules/models (no HTTP) |
 | R9 frontend | `tests-e2e/claim.spec.js` |

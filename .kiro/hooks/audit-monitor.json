@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Audit Monitor on Stop",
+      "trigger": "Stop",
+      "description": "After each agent turn, checks the append-only audit log for any new outside-project access attempts and prints an alert listing them.",
+      "action": {
+        "type": "command",
+        "command": "bash .kiro/security/tests/monitor-audit.sh",
+        "timeout": 30
+      }
+    }
+  ]
+}

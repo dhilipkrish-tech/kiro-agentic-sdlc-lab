@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 #: Maximum dispensable quantity. A claim with quantity strictly greater than this
 #: is rejected with QUANTITY_LIMIT_EXCEEDED.
-QUANTITY_LIMIT: int = 30
+QUANTITY_LIMIT: int = 60
 
 #: Drug IDs that require prior authorization and are rejected when submitted.
 PRIOR_AUTH_DRUG_IDS: frozenset[str] = frozenset({"DRUG-PA-001"})
